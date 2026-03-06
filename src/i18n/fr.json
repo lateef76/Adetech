@@ -1,0 +1,43 @@
+{
+  "common": {
+    "dashboard": "Tableau de bord",
+    "products": "Produits",
+    "clients": "Clients",
+    "invoices": "Factures",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié?",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Attention"
+  },
+  "pages": {
+    "login": {
+      "title": "Connexion",
+      "signIn": "Se connecter",
+      "dontHaveAccount": "Pas de compte?",
+      "signUp": "S'inscrire"
+    },
+    "register": {
+      "title": "S'inscrire",
+      "createAccount": "Créer un compte",
+      "alreadyHaveAccount": "Vous avez déjà un compte?",
+      "signIn": "Se connecter"
+    },
+    "dashboard": {
+      "title": "Tableau de bord",
+      "welcome": "Bienvenue à Adetech Quincaillerie"
+    }
+  }
+}
