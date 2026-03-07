@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { TrendingUp } from "lucide-react";
+import { useSalesTrendData } from "@/hooks/useSalesTrendData";
 import {
   AreaChart,
   Area,
@@ -10,22 +11,35 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { week: "W1", sales: 100, target: 120 },
-  { week: "W2", sales: 150, target: 140 },
-  { week: "W3", sales: 120, target: 130 },
-  { week: "W4", sales: 200, target: 180 },
-  { week: "W5", sales: 180, target: 160 },
-  { week: "W6", sales: 220, target: 200 },
-  { week: "W7", sales: 250, target: 230 },
-  { week: "W8", sales: 300, target: 280 },
-];
-
 export function SalesTrendChart() {
+  const { data, loading, error } = useSalesTrendData();
+
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
+  if (loading) {
+    return (
+      <motion.div
+        variants={itemVariants}
+        className="bg-linear-to-br from-slate-800 to-slate-900 rounded-xl border border-white/10 p-6"
+      >
+        <p className="text-gray-400">Loading sales trend data...</p>
+      </motion.div>
+    );
+  }
+
+  if (error) {
+    return (
+      <motion.div
+        variants={itemVariants}
+        className="bg-linear-to-br from-slate-800 to-slate-900 rounded-xl border border-white/10 p-6"
+      >
+        <p className="text-red-400">Error: {error}</p>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

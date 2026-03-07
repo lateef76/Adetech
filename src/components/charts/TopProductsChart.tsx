@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Package } from "lucide-react";
+import { useTopProductsData } from "@/hooks/useTopProductsData";
 import {
   BarChart,
   Bar,
@@ -10,20 +11,35 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { name: "Hammer", sales: 400 },
-  { name: "Wrench", sales: 300 },
-  { name: "Screwdriver", sales: 200 },
-  { name: "Drill", sales: 278 },
-  { name: "Saw", sales: 189 },
-  { name: "Nails", sales: 239 },
-];
-
 export function TopProductsChart() {
+  const { data, loading, error } = useTopProductsData();
+
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
+  if (loading) {
+    return (
+      <motion.div
+        variants={itemVariants}
+        className="bg-linear-to-br from-slate-800 to-slate-900 rounded-xl border border-white/10 p-6"
+      >
+        <p className="text-gray-400">Loading product data...</p>
+      </motion.div>
+    );
+  }
+
+  if (error) {
+    return (
+      <motion.div
+        variants={itemVariants}
+        className="bg-linear-to-br from-slate-800 to-slate-900 rounded-xl border border-white/10 p-6"
+      >
+        <p className="text-red-400">Error: {error}</p>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

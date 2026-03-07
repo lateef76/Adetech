@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { TrendingUp } from "lucide-react";
+import { useRevenueData } from "@/hooks/useRevenueData";
 import {
   LineChart,
   Line,
@@ -10,26 +11,35 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { month: "Jan", revenue: 4000 },
-  { month: "Feb", revenue: 3000 },
-  { month: "Mar", revenue: 2000 },
-  { month: "Apr", revenue: 2780 },
-  { month: "May", revenue: 1890 },
-  { month: "Jun", revenue: 2390 },
-  { month: "Jul", revenue: 3490 },
-  { month: "Aug", revenue: 4200 },
-  { month: "Sep", revenue: 3800 },
-  { month: "Oct", revenue: 4500 },
-  { month: "Nov", revenue: 5000 },
-  { month: "Dec", revenue: 5500 },
-];
-
 export function RevenueChart() {
+  const { data, loading, error } = useRevenueData();
+
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
+  if (loading) {
+    return (
+      <motion.div
+        variants={itemVariants}
+        className="bg-linear-to-br from-slate-800 to-slate-900 rounded-xl border border-white/10 p-6"
+      >
+        <p className="text-gray-400">Loading revenue data...</p>
+      </motion.div>
+    );
+  }
+
+  if (error) {
+    return (
+      <motion.div
+        variants={itemVariants}
+        className="bg-linear-to-br from-slate-800 to-slate-900 rounded-xl border border-white/10 p-6"
+      >
+        <p className="text-red-400">Error: {error}</p>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
