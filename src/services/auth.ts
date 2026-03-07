@@ -5,15 +5,53 @@ import {
   sendPasswordResetEmail,
   updatePassword,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
   type User,
-  type Auth,
 } from 'firebase/auth'
 import { auth } from './firebase'
+import { db } from './firebase'
+import { doc, setDoc, getDoc } from 'firebase/firestore'
 
 export interface AuthResponse {
   success: boolean
   error?: Error | null
   data?: unknown
+}
+
+// Helper function to create or update user document in Firestore
+async function createUserDocument(user: User, additionalData: Record<string, unknown> = {}) {
+  if (!user) return
+
+  const userRef = doc(db, 'users', user.uid)
+  const userSnapshot = await getDoc(userRef)
+
+  // Only create if user doesn't exist
+  if (!userSnapshot.exists()) {
+    const {
+      displayName,
+      email,
+      photoURL,
+    } = user
+
+    try {
+      await setDoc(userRef, {
+        displayName: displayName || additionalData.displayName || '',
+        email: email || '',
+        photoURL: photoURL || '',
+        businessName: additionalData.businessName || '',
+        businessType: additionalData.businessType || 'user',
+        phone: additionalData.phone || '',
+        address: additionalData.address || '',
+        role: 'user', // Default role
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+    } catch (error) {
+      console.error('Error creating user document:', error)
+    }
+  }
 }
 
 export const authService = {
@@ -24,6 +62,7 @@ export const authService = {
         email,
         password
       )
+      await createUserDocument(userCredential.user)
       return { success: true, data: userCredential.user }
     } catch (error) {
       return { success: false, error: error as Error }
@@ -37,6 +76,17 @@ export const authService = {
         email,
         password
       )
+      return { success: true, data: userCredential.user }
+    } catch (error) {
+      return { success: false, error: error as Error }
+    }
+  },
+
+  async signInWithGoogle(): Promise<AuthResponse> {
+    try {
+      const provider = new GoogleAuthProvider()
+      const userCredential = await signInWithPopup(auth, provider)
+      await createUserDocument(userCredential.user)
       return { success: true, data: userCredential.user }
     } catch (error) {
       return { success: false, error: error as Error }
