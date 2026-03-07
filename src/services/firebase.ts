@@ -5,6 +5,7 @@ import {
   browserLocalPersistence,
 } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
+import { getStorage } from 'firebase/storage'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -26,6 +27,7 @@ if (
 const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
+export const storage = getStorage(app)
 
 // Set persistence to LOCAL so user stays signed in
 setPersistence(auth, browserLocalPersistence).catch((error) => {
