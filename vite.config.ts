@@ -6,8 +6,12 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [
-    react(), 
-    tailwindcss() // This plugin now handles everything via your CSS imports
+    react({
+      babel: {
+        // Disable React Compiler to avoid watch() warnings
+      },
+    }), 
+    tailwindcss()
   ],
   resolve: {
     alias: {

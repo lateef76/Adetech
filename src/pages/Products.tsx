@@ -128,7 +128,11 @@ export function ProductsPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader 
+          title="Products"
+          description="Manage your product inventory and categories"
+          userName={user?.displayName || "User"}
+        />
 
         {/* Header Section */}
         <motion.div

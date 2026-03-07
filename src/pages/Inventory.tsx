@@ -27,7 +27,10 @@ export function InventoryPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader
+          title="Inventory"
+          description="Track and manage your product inventory"
+        />
 
         <motion.div
           variants={itemVariants}

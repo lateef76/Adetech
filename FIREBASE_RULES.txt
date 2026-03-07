@@ -1,67 +1,155 @@
-CORRECTED FIRESTORE SECURITY RULES
-(Copy-paste this exactly into Firebase Console)
+FIRESTORE SECURITY RULES - PRODUCTION READY
+(Copy-paste this exactly into Firebase Console > Firestore > Rules)
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if user is admin
-    function isAdmin() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    
+    // Check if user is authenticated
+    function isAuthed() {
+      return request.auth != null;
     }
     
-    // Users collection
+    // Check if user is admin
+    function isAdmin() {
+      return isAuthed() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin");
+    }
+    
+    // Check if user owns the resource
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Verify required fields exist
+    function hasRequiredFields(requiredFields) {
+      return resource == null || 
+        !resource.data.keys().hasAll(requiredFields);
+    }
+    
+    // ============================================
+    // USERS COLLECTION
+    // ============================================
+    
     match /users/{userId} {
-      allow read: if request.auth.uid == userId;
-      allow create: if request.auth.uid == userId;
-      allow update: if request.auth.uid == userId || isAdmin();
+      // Users can only read their own profile
+      allow read: if isOwner(userId);
+      
+      // Users create their own profile on signup
+      allow create: if isOwner(userId) && 
+        request.resource.data.role in ["user", "admin"] &&
+        request.resource.data.role == "user"; // New users are always "user"
+      
+      // Users update their own profile
+      allow update: if isOwner(userId) || isAdmin();
+      
+      // Only admins can delete users
       allow delete: if isAdmin();
     }
     
-    // Invoices - only admins and invoice owner
-    match /invoices/{invoiceId} {
-      allow read: if isAdmin() || request.auth.uid == resource.data.userId;
-      allow write: if isAdmin() || request.auth.uid == resource.data.userId;
-      allow create: if isAdmin() || request.auth.uid == request.resource.data.userId;
-    }
+    // ============================================
+    // CLIENTS COLLECTION - Phase 4
+    // ============================================
     
-    // Clients - only admins and client owner
     match /clients/{clientId} {
-      allow read: if isAdmin() || request.auth.uid == resource.data.userId;
-      allow write: if isAdmin() || request.auth.uid == resource.data.userId;
-      allow create: if isAdmin() || request.auth.uid == request.resource.data.userId;
+      // Owners and admins can read their clients
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Create clients
+      allow create: if isAuthed() && 
+        isOwner(request.resource.data.userId) &&
+        request.resource.data.name is string &&
+        request.resource.data.client_type in ["professional", "individual"];
+      
+      // Update clients
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Delete clients
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
     
-    // Products - users can manage their own products
+    // ============================================
+    // PRODUCTS COLLECTION - Phase 3
+    // ============================================
+    
     match /products/{productId} {
-      allow read: if isAdmin() || request.auth.uid == resource.data.userId;
-      allow write: if isAdmin() || request.auth.uid == resource.data.userId;
-      allow create: if isAdmin() || request.auth.uid == request.resource.data.userId;
+      // Owners and admins can read products
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Create products
+      allow create: if isAuthed() && 
+        isOwner(request.resource.data.userId) &&
+        request.resource.data.name is string &&
+        request.resource.data.price >= 0;
+      
+      // Update products
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Delete products
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
     
-    // Categories - only admins
+    // ============================================
+    // RECEIPTS/INVOICES COLLECTION - Phase 5
+    // ============================================
+    
+    match /receipts/{receiptId} {
+      // Owners and admins can read receipts
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Create receipts
+      allow create: if isAuthed() && 
+        isOwner(request.resource.data.userId) &&
+        request.resource.data.receiptNumber is string &&
+        request.resource.data.status in ["draft", "sent", "paid"];
+      
+      // Update receipts
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Delete receipts (only drafts)
+      allow delete: if (isOwner(resource.data.userId) || isAdmin()) && 
+        resource.data.status == "draft";
+    }
+    
+    // Legacy invoices support (mapped to receipts)
+    match /invoices/{invoiceId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthed() && isOwner(request.resource.data.userId);
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      allow delete: if (isOwner(resource.data.userId) || isAdmin()) && 
+        resource.data.status == "draft";
+    }
+    
+    // ============================================
+    // CATEGORIES COLLECTION
+    // ============================================
+    
     match /categories/{categoryId} {
-      allow read, write: if isAdmin();
-    }
-  }
-}
-
-=====================================
-FIREBASE STORAGE SECURITY RULES
-(Copy-paste this into Firebase Console > Storage > Rules)
-=====================================
-
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    // Products folder - users can upload/delete their own product images
-    match /products/{userId}/{productId}/{allPaths=**} {
-      allow read: if true; // Public read access to product images
-      allow write: if request.auth.uid == userId;
-      allow delete: if request.auth.uid == userId;
+      // Admins manage categories
+      allow read: if isAuthed(); // Everyone can read
+      allow create, update, delete: if isAdmin();
     }
     
-    // Deny everything else
-    match /{allPaths=**} {
+    // ============================================
+    // SUPPLIERS COLLECTION (Future Phase)
+    // ============================================
+    
+    match /suppliers/{supplierId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthed() && isOwner(request.resource.data.userId);
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    // ============================================
+    // CATCH-ALL DENY
+    // ============================================
+    
+    match /{document=**} {
       allow read, write: if false;
     }
   }

@@ -27,7 +27,11 @@ export function SettingsPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader 
+          title="Settings"
+          description="Configure your application settings"
+          userName={user?.displayName || "User"}
+        />
 
         <motion.div
           variants={itemVariants}

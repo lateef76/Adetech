@@ -6,7 +6,7 @@ import { ForgotPasswordPage } from "@/pages/ForgotPassword";
 import { DashboardPage } from "@/pages/Dashboard";
 import { InventoryPage } from "@/pages/Inventory";
 import { SalesPage } from "@/pages/Sales";
-import { InvoicesPage } from "@/pages/Invoices";
+import { ReceiptsPage } from "@/pages/Receipts";
 import { ClientsPage } from "@/pages/Clients";
 import { SuppliersPage } from "@/pages/Suppliers";
 import { ProductsPage } from "@/pages/Products";
@@ -56,10 +56,10 @@ export default function App() {
           }
         />
         <Route
-          path="/invoices"
+          path="/receipts"
           element={
             <ProtectedRoute>
-              <InvoicesPage />
+              <ReceiptsPage />
             </ProtectedRoute>
           }
         />

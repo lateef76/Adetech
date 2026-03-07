@@ -27,7 +27,10 @@ export function NotificationsPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader
+          title="Notifications"
+          description="Stay updated with your business activities"
+        />
 
         <motion.div
           variants={itemVariants}

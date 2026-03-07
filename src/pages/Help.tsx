@@ -27,7 +27,10 @@ export function HelpPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader
+          title="Help & Support"
+          description="Find answers and get support"
+        />
 
         <motion.div
           variants={itemVariants}

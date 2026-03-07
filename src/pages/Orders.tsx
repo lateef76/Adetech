@@ -27,7 +27,10 @@ export function OrdersPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader
+          title="Orders"
+          description="View and manage all customer orders"
+        />
 
         <motion.div
           variants={itemVariants}

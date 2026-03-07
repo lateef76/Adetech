@@ -138,7 +138,11 @@ export function DashboardPage() {
         animate="visible"
       >
         {/* Header Section */}
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader
+          title="Dashboard"
+          description="Welcome back to your business dashboard"
+          userName={user?.displayName || user?.email || "User"}
+        />
 
         {/* Stats Grid */}
         <motion.div

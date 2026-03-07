@@ -27,7 +27,11 @@ export function ReportsPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader 
+          title="Reports"
+          description="Generate and analyze business reports"
+          userName={user?.displayName || "User"}
+        />
 
         <motion.div
           variants={itemVariants}

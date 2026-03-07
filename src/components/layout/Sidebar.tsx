@@ -16,9 +16,6 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Store,
-  Hammer,
-  Wrench,
   Truck,
   HelpCircle,
   Bell,
@@ -26,8 +23,6 @@ import {
   ShoppingCart,
   TrendingUp,
   Award,
-  Shield,
-  HardHat,
   ClipboardList,
   DollarSign,
 } from "lucide-react";
@@ -66,8 +61,8 @@ export function Sidebar() {
           },
           { name: "Sales", path: "/sales", icon: <TrendingUp size={20} /> },
           {
-            name: "Invoices",
-            path: "/invoices",
+            name: "Receipts",
+            path: "/receipts",
             icon: <FileText size={20} />,
             badge: invoices > 0 ? invoices : undefined,
           },
@@ -198,33 +193,6 @@ export function Sidebar() {
           />
         </div>
 
-        {/* Animated Hardware Icons Background */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none overflow-hidden">
-          {[Hammer, Wrench, Package, HardHat, Shield].map((Icon, i) => (
-            <motion.div
-              key={i}
-              className="absolute"
-              style={{
-                top: `${10 + i * 20}%`,
-                left: `${10 + i * 15}%`,
-              }}
-              animate={{
-                y: [0, -20, 20, 0],
-                x: [0, 10, -10, 0],
-                rotate: [0, 45, -45, 0],
-              }}
-              transition={{
-                duration: 10 + i * 2,
-                repeat: Infinity,
-                delay: i * 2,
-                ease: "linear",
-              }}
-            >
-              <Icon size={40} className="text-orange-500/20" />
-            </motion.div>
-          ))}
-        </div>
-
         {/* Logo Section */}
         <motion.div
           className="relative p-6 border-b border-white/10 flex items-center justify-between overflow-hidden"
@@ -235,70 +203,95 @@ export function Sidebar() {
               variants={itemVariants}
               initial="closed"
               animate="open"
-              className="flex flex-col relative z-10 w-full"
+              className="flex items-center gap-4 relative z-10 w-full"
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-3">
-                  <motion.div
-                    whileHover={{ rotate: 180 }}
-                    transition={{ duration: 0.5 }}
-                    className="relative"
+              {/* Minimal Vector Logo - Stylized A */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="relative shrink-0"
+              >
+                {/* Glow effect */}
+                <div className="absolute inset-0 bg-linear-to-br from-orange-500 to-orange-600 rounded-lg blur-lg opacity-50" />
+                
+                {/* Logo container */}
+                <div className="relative w-12 h-12 bg-linear-to-br from-orange-500/10 to-orange-600/10 rounded-lg border border-orange-500/30 flex items-center justify-center backdrop-blur-sm">
+                  {/* Stylized A letter */}
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-7 h-7 text-orange-400"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
-                    <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-md" />
-                    <Store
-                      className="text-orange-500 relative z-10"
-                      size={36}
-                    />
-                  </motion.div>
-                  <div>
-                    <motion.h1
-                      className="text-white font-bold text-xl"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                    >
-                      Adetech
-                    </motion.h1>
-                    <motion.p
-                      className="text-orange-400 text-xs flex items-center gap-1"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.2 }}
-                    >
-                      <Hammer size={12} />
-                      Hardware Store
-                      <Wrench size={12} />
-                    </motion.p>
-                  </div>
+                    {/* Triangle top point */}
+                    <path d="M12 2 L22 22 H2 Z" />
+                    {/* Horizontal line through middle */}
+                    <path d="M6 16 L18 16" />
+                  </svg>
                 </div>
+              </motion.div>
 
-                {/* Toggle button for desktop */}
-                <motion.button
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="hidden lg:flex p-1.5 rounded-lg hover:bg-white/10 text-orange-400 transition-colors"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+              {/* Text Section */}
+              <div className="flex-1 min-w-0">
+                <motion.h1
+                  className="text-2xl font-bold bg-linear-to-r from-orange-400 via-orange-300 to-orange-400 bg-clip-text text-transparent"
+                  style={{
+                    textShadow: "0 0 20px rgba(249, 115, 22, 0.3)",
+                  }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <ChevronLeft size={18} />
-                </motion.button>
+                  Adetech
+                </motion.h1>
               </div>
+
+              {/* Toggle button for desktop */}
+              <motion.button
+                onClick={() => setIsOpen(!isOpen)}
+                className="hidden lg:flex p-1.5 rounded-lg hover:bg-orange-500/10 text-orange-400 transition-colors"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                title="Toggle sidebar"
+              >
+                <ChevronLeft size={18} />
+              </motion.button>
             </motion.div>
           ) : (
             <motion.div
               variants={itemVariants}
               initial="closed"
               animate="open"
-              className="w-full flex flex-col items-center gap-1 relative z-10"
+              className="w-full flex flex-col items-center gap-3 relative z-10"
             >
-              <motion.div whileHover={{ scale: 1.1 }} className="relative">
-                <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-md" />
-                <Store className="text-orange-500 relative z-10" size={28} />
+              {/* Collapsed Logo */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 bg-linear-to-br from-orange-500 to-orange-600 rounded-lg blur-lg opacity-50" />
+                <div className="relative w-10 h-10 bg-linear-to-br from-orange-500/10 to-orange-600/10 rounded-lg border border-orange-500/30 flex items-center justify-center backdrop-blur-sm">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-6 h-6 text-orange-400"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 2 L22 22 H2 Z" />
+                    <path d="M6 16 L18 16" />
+                  </svg>
+                </div>
               </motion.div>
 
               {/* Toggle button for desktop when collapsed */}
               <motion.button
                 onClick={() => setIsOpen(!isOpen)}
-                className="hidden lg:flex p-1.5 rounded-lg hover:bg-white/10 text-orange-400 transition-colors mt-2"
+                className="hidden lg:flex p-1.5 rounded-lg hover:bg-orange-500/10 text-orange-400 transition-colors"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -408,7 +401,7 @@ export function Sidebar() {
           <div className="h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
         </div>
 
-        {/* Logout Section */}
+        {/* Logout Section with Status */}
         <motion.div
           className="p-3"
           initial={{ opacity: 0 }}
@@ -417,7 +410,7 @@ export function Sidebar() {
         >
           <motion.button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 group relative overflow-hidden"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 relative overflow-hidden"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -446,14 +439,16 @@ export function Sidebar() {
         {/* User Info (when sidebar is open) */}
         {isOpen && user && (
           <motion.div
-            className="p-4 border-t border-white/10 mt-2"
+            className="p-4 border-t border-white/10 mt-2 bg-linear-to-b from-slate-800/50 to-slate-900/50"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-linear-to-r from-orange-500 to-orange-600 flex items-center justify-center text-white font-bold">
+              <motion.div 
+                className="relative"
+              >
+                <div className="w-10 h-10 rounded-full bg-linear-to-r from-orange-500 to-orange-600 flex items-center justify-center text-white font-bold shadow-lg shadow-orange-500/30">
                   {user.displayName
                     ? user.displayName
                         .split(" ")
@@ -462,10 +457,9 @@ export function Sidebar() {
                         .toUpperCase()
                     : (user.email?.[0].toUpperCase() ?? "U")}
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-900" />
-              </div>
+              </motion.div>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-medium truncate">
+                <p className="text-white font-medium text-sm truncate">
                   {user.displayName || "User"}
                 </p>
                 <p className="text-orange-400/60 text-xs truncate">

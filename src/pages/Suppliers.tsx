@@ -27,7 +27,11 @@ export function SuppliersPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader 
+          title="Suppliers"
+          description="Manage your business suppliers and vendors"
+          userName={user?.displayName || "User"}
+        />
 
         <motion.div
           variants={itemVariants}

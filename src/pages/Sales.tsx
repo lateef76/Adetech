@@ -27,7 +27,11 @@ export function SalesPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader 
+          title="Sales"
+          description="Track and analyze your sales performance"
+          userName={user?.displayName || "User"}
+        />
 
         <motion.div
           variants={itemVariants}

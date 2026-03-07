@@ -27,7 +27,10 @@ export function PerformancePage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader
+          title="Performance"
+          description="Monitor your business performance metrics"
+        />
 
         <motion.div
           variants={itemVariants}

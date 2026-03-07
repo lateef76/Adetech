@@ -27,7 +27,11 @@ export function RevenuePage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader 
+          title="Revenue"
+          description="Monitor your revenue and earnings"
+          userName={user?.displayName || "User"}
+        />
 
         <motion.div
           variants={itemVariants}

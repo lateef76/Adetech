@@ -27,7 +27,11 @@ export function ProfilePage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader userName={user?.displayName || "User"} />
+        <DashboardHeader 
+          title="Profile"
+          description="Manage your profile and personal information"
+          userName={user?.displayName || "User"}
+        />
 
         <motion.div
           variants={itemVariants}
