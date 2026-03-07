@@ -1,5 +1,8 @@
 import { MainLayout } from "@/layouts/MainLayout";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
+import { RevenueChart } from "@/components/charts/RevenueChart";
+import { TopProductsChart } from "@/components/charts/TopProductsChart";
+import { SalesTrendChart } from "@/components/charts/SalesTrendChart";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -208,6 +211,24 @@ export function DashboardPage() {
               <div className="absolute inset-0 bg-linear-to-r from-orange-500/0 via-orange-500/5 to-orange-500/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* Analytics Charts Section */}
+        <motion.div
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+          variants={containerVariants}
+        >
+          <motion.div variants={itemVariants} className="lg:col-span-2">
+            <RevenueChart />
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <TopProductsChart />
+          </motion.div>
+        </motion.div>
+
+        {/* Sales Trend Section */}
+        <motion.div variants={itemVariants}>
+          <SalesTrendChart />
         </motion.div>
 
         {/* Charts and Tables Section */}
