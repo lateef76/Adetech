@@ -24,20 +24,52 @@
   },
   "pages": {
     "login": {
-      "title": "Sign In",
-      "signIn": "Sign In",
-      "dontHaveAccount": "Don't have an account?",
-      "signUp": "Sign up"
+      "title": "Adetech Quincaillerie",
+      "subtitle": "Sign in to your account",
+      "email": "Email Address",
+      "email_placeholder": "name@example.com",
+      "email_required": "Email is required",
+      "email_invalid": "Invalid email format",
+      "password": "Password",
+      "password_placeholder": "••••••••",
+      "password_required": "Password is required",
+      "password_too_short": "Password must be at least 6 characters",
+      "forgot_password": "Forgot password?",
+      "sign_in": "Sign in",
+      "signing_in": "Signing in...",
+      "no_account": "Don't have an account?",
+      "sign_up": "Sign up",
+      "login_failed": "Login failed. Please check your credentials.",
+      "all_fields_required": "Please fill in all fields"
     },
     "register": {
-      "title": "Register",
-      "createAccount": "Create Account",
-      "alreadyHaveAccount": "Already have an account?",
-      "signIn": "Sign in"
+      "title": "Create Account",
+      "subtitle": "Join Adetech Quincaillerie",
+      "email": "Email Address",
+      "email_placeholder": "name@example.com",
+      "password": "Password",
+      "password_placeholder": "••••••••",
+      "password_confirm": "Confirm Password",
+      "password_confirm_placeholder": "••••••••",
+      "password_too_short": "Password must be at least 6 characters",
+      "password_mismatch": "Passwords do not match",
+      "terms": "I agree to the Terms of Service",
+      "sign_up": "Sign up",
+      "signing_up": "Creating account...",
+      "already_have_account": "Already have an account?",
+      "sign_in": "Sign in"
     },
     "dashboard": {
       "title": "Dashboard",
       "welcome": "Welcome to Adetech Quincaillerie"
+    },
+    "forgot_password": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive reset instructions",
+      "email": "Email Address",
+      "send": "Send Reset Link",
+      "sending": "Sending...",
+      "back_to_login": "Back to login"
     }
   }
 }

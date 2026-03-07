@@ -24,20 +24,52 @@
   },
   "pages": {
     "login": {
-      "title": "Connexion",
-      "signIn": "Se connecter",
-      "dontHaveAccount": "Pas de compte?",
-      "signUp": "S'inscrire"
+      "title": "Adetech Quincaillerie",
+      "subtitle": "Connectez-vous à votre compte",
+      "email": "Adresse e-mail",
+      "email_placeholder": "nom@exemple.com",
+      "email_required": "L'adresse e-mail est requise",
+      "email_invalid": "Format d'e-mail invalide",
+      "password": "Mot de passe",
+      "password_placeholder": "••••••••",
+      "password_required": "Le mot de passe est requis",
+      "password_too_short": "Le mot de passe doit contenir au moins 6 caractères",
+      "forgot_password": "Mot de passe oublié?",
+      "sign_in": "Se connecter",
+      "signing_in": "Connexion en cours...",
+      "no_account": "Vous n'avez pas de compte?",
+      "sign_up": "S'inscrire",
+      "login_failed": "Échec de la connexion. Veuillez vérifier vos identifiants.",
+      "all_fields_required": "Veuillez remplir tous les champs"
     },
     "register": {
-      "title": "S'inscrire",
-      "createAccount": "Créer un compte",
-      "alreadyHaveAccount": "Vous avez déjà un compte?",
-      "signIn": "Se connecter"
+      "title": "Créer un compte",
+      "subtitle": "Rejoignez Adetech Quincaillerie",
+      "email": "Adresse e-mail",
+      "email_placeholder": "nom@exemple.com",
+      "password": "Mot de passe",
+      "password_placeholder": "••••••••",
+      "password_confirm": "Confirmer le mot de passe",
+      "password_confirm_placeholder": "••••••••",
+      "password_too_short": "Le mot de passe doit contenir au moins 6 caractères",
+      "password_mismatch": "Les mots de passe ne correspondent pas",
+      "terms": "J'accepte les Conditions d'utilisation",
+      "sign_up": "S'inscrire",
+      "signing_up": "Création du compte...",
+      "already_have_account": "Vous avez déjà un compte?",
+      "sign_in": "Se connecter"
     },
     "dashboard": {
       "title": "Tableau de bord",
       "welcome": "Bienvenue à Adetech Quincaillerie"
+    },
+    "forgot_password": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Entrez votre adresse e-mail pour recevoir les instructions de réinitialisation",
+      "email": "Adresse e-mail",
+      "send": "Envoyer le lien de réinitialisation",
+      "sending": "Envoi en cours...",
+      "back_to_login": "Retour à la connexion"
     }
   }
 }

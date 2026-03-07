@@ -1,22 +1,30 @@
-import { supabase } from './supabase'
-import type { Session } from '@supabase/supabase-js'
-import { AuthError } from '@supabase/supabase-js'
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  updatePassword,
+  onAuthStateChanged,
+  type User,
+  type Auth,
+} from 'firebase/auth'
+import { auth } from './firebase'
 
 export interface AuthResponse {
   success: boolean
-  error?: AuthError | Error | null
+  error?: Error | null
   data?: unknown
 }
 
 export const authService = {
   async signUp(email: string, password: string): Promise<AuthResponse> {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
         email,
-        password,
-      })
-      if (error) return { success: false, error }
-      return { success: true, data }
+        password
+      )
+      return { success: true, data: userCredential.user }
     } catch (error) {
       return { success: false, error: error as Error }
     }
@@ -24,12 +32,12 @@ export const authService = {
 
   async signIn(email: string, password: string): Promise<AuthResponse> {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
         email,
-        password,
-      })
-      if (error) return { success: false, error }
-      return { success: true, data }
+        password
+      )
+      return { success: true, data: userCredential.user }
     } catch (error) {
       return { success: false, error: error as Error }
     }
@@ -37,8 +45,7 @@ export const authService = {
 
   async signOut(): Promise<AuthResponse> {
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) return { success: false, error }
+      await signOut(auth)
       return { success: true }
     } catch (error) {
       return { success: false, error: error as Error }
@@ -47,10 +54,9 @@ export const authService = {
 
   async resetPassword(email: string): Promise<AuthResponse> {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      await sendPasswordResetEmail(auth, email, {
+        url: `${window.location.origin}/login`,
       })
-      if (error) return { success: false, error }
       return { success: true }
     } catch (error) {
       return { success: false, error: error as Error }
@@ -59,41 +65,36 @@ export const authService = {
 
   async updatePassword(newPassword: string): Promise<AuthResponse> {
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      })
-      if (error) return { success: false, error }
+      const user = auth.currentUser
+      if (!user) {
+        return { success: false, error: new Error('No user logged in') }
+      }
+      await updatePassword(user, newPassword)
       return { success: true }
     } catch (error) {
       return { success: false, error: error as Error }
     }
   },
 
-  async getCurrentUser() {
+  async getCurrentUser(): Promise<User | null> {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      return user
+      return auth.currentUser
     } catch (error) {
       console.error('Error getting current user:', error)
       return null
     }
   },
 
-  async getSession() {
+  async getSession(): Promise<User | null> {
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      return session
+      return auth.currentUser
     } catch (error) {
       console.error('Error getting session:', error)
       return null
     }
   },
 
-  onAuthStateChange(callback: (event: string, session: Session | null) => void) {
-    return supabase.auth.onAuthStateChange(callback)
+  onAuthStateChange(callback: (user: User | null) => void) {
+    return onAuthStateChanged(auth, callback)
   },
 }

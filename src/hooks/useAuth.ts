@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
-import type { User, Session } from '@supabase/supabase-js'
-import { supabase } from '@/services/supabase'
+import type { User } from 'firebase/auth'
+import { auth } from '@/services/firebase'
+import { authService } from '@/services/auth'
 
 interface UseAuthReturn {
   user: User | null
-  session: Session | null
   loading: boolean
   isAuthenticated: boolean
   signOut: () => Promise<void>
@@ -12,35 +12,23 @@ interface UseAuthReturn {
 
 export function useAuth(): UseAuthReturn {
   const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user || null)
-      setLoading(false)
-    })
-
     // Setup listener for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      setUser(session?.user || null)
+    const unsubscribe = authService.onAuthStateChange((currentUser) => {
+      setUser(currentUser)
       setLoading(false)
     })
 
-    return () => subscription?.unsubscribe()
+    return () => unsubscribe()
   }, [])
 
   const signOut = useCallback(async () => {
     setLoading(true)
     try {
-      await supabase.auth.signOut()
+      await authService.signOut()
       setUser(null)
-      setSession(null)
     } catch (error) {
       console.error('Error signing out:', error)
     } finally {
@@ -50,7 +38,6 @@ export function useAuth(): UseAuthReturn {
 
   return {
     user,
-    session,
     loading,
     isAuthenticated: !!user,
     signOut,

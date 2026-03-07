@@ -10,12 +10,12 @@ This document provides detailed, actionable steps for building each phase of the
 
 ---
 
-## **PHASE 0: Project Setup & Supabase Configuration** ⚙️
+## **PHASE 0: Project Setup & Firebase Configuration** ⚙️
 ### Duration: Week 1
 
 ### 🎯 Objectives:
 - Set up the complete development environment
-- Configure Supabase backend
+- Configure Firebase backend
 - Initialize all required tools and configurations
 - Test the foundation
 
@@ -61,7 +61,7 @@ This document provides detailed, actionable steps for building each phase of the
 #### Tasks:
 1. **Install production dependencies (one command)**
    ```bash
-   npm install react-router-dom @supabase/supabase-js react-hook-form zod @hookform/resolvers lucide-react class-variance-authority clsx tailwind-merge framer-motion @tanstack/react-table @tanstack/react-query date-fns react-day-picker zustand sonner recharts fuse.js pdfjs-dist tesseract.js jspdf jspdf-autotable react-dropzone papaparse uuid i18next react-i18next i18next-browser-languagedetector qrcode.react
+   npm install react-router-dom firebase react-hook-form zod @hookform/resolvers lucide-react class-variance-authority clsx tailwind-merge framer-motion @tanstack/react-table @tanstack/react-query date-fns react-day-picker zustand sonner recharts fuse.js pdfjs-dist tesseract.js jspdf jspdf-autotable react-dropzone papaparse uuid i18next react-i18next i18next-browser-languagedetector qrcode.react
    ```
 
 2. **Install dev dependencies**
@@ -167,14 +167,22 @@ This document provides detailed, actionable steps for building each phase of the
 #### Tasks:
 1. **Create `.env.local` file**
    ```
-   VITE_SUPABASE_URL=your_supabase_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_FIREBASE_API_KEY=your_firebase_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+   VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+   VITE_FIREBASE_APP_ID=your_firebase_app_id
    ```
 
 2. **Create `.env.example` (for team)**
    ```
-   VITE_SUPABASE_URL=
-   VITE_SUPABASE_ANON_KEY=
+   VITE_FIREBASE_API_KEY=
+   VITE_FIREBASE_AUTH_DOMAIN=
+   VITE_FIREBASE_PROJECT_ID=
+   VITE_FIREBASE_STORAGE_BUCKET=
+   VITE_FIREBASE_MESSAGING_SENDER_ID=
+   VITE_FIREBASE_APP_ID=
    ```
 
 3. **Update `.gitignore`**
@@ -187,182 +195,94 @@ This document provides detailed, actionable steps for building each phase of the
 
 #### Testing:
 - [ ] `.env.local` is in .gitignore
-- [ ] Can access env vars in code: `import.meta.env.VITE_SUPABASE_URL`
+- [ ] Can access env vars in code: `import.meta.env.VITE_FIREBASE_API_KEY`
 - [ ] Variables are not logged to console
 
 ---
 
-### **STEP 0.6: Create Supabase Project**
+### **STEP 0.6: Create Firebase Project**
 
 #### Tasks:
-1. **Create free Supabase account** at supabase.com
+1. **Create free Firebase account** at firebase.google.com
 
 2. **Create new project**
-   - Region: Closest to your location
-   - Org: Your organization
    - Project name: `adetech-invoice`
+   - Enable Google Analytics (optional)
+   - Accept Firebase terms
 
 3. **Copy credentials to `.env.local`**
-   - Supabase URL
-   - Anon Key
+   - API Key
+   - Auth Domain
+   - Project ID
+   - Storage Bucket
+   - Messaging Sender ID
+   - App ID
 
 4. **Enable Auth methods**
-   - Go to Authentication > Providers
+   - Go to Authentication > Sign-in method
    - Enable Email/Password
    - Disable other providers for now
 
 #### Testing:
-- [ ] Can connect to Supabase from app
+- [ ] Can connect to Firebase from app
 - [ ] No auth errors in console
 
 ---
 
-### **STEP 0.7: Create Database Tables**
+### **STEP 0.7: Create Firestore Collections**
 
 #### Tasks:
-1. **Create `users` table** (Use Supabase Auth instead)
-   - Auth is managed by Supabase automatically
-   - Additional user data stored in `profiles` table
+1. **Create `profiles` collection**
+   - Store user profile data
+   - Document ID: User UID from Firebase Auth
+   - Fields: email, role (admin/staff), created_at
 
-2. **Create `profiles` table**
-   ```sql
-   CREATE TABLE profiles (
-     id UUID REFERENCES auth.users ON DELETE CASCADE,
-     email TEXT UNIQUE,
-     role TEXT DEFAULT 'staff', -- admin, staff
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-     PRIMARY KEY (id)
-   );
-   ```
+2. **Create `categories` collection**
+   - Documents: 'plomberie', 'electricite', 'outillage', 'quincaillerie', 'peinture', 'materiaux'
+   - Fields: name, description, created_at
 
-3. **Create `categories` table**
-   ```sql
-   CREATE TABLE categories (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     name TEXT UNIQUE NOT NULL,
-     description TEXT,
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
+3. **Create `products` collection**
+   - Fields: name, category_id, wholesale_price, retail_price, quantity, unit, image_url, created_at, updated_at
 
-   INSERT INTO categories (name) VALUES 
-   ('Plomberie'),
-   ('Électricité'),
-   ('Outillage'),
-   ('Quincaillerie'),
-   ('Peinture'),
-   ('Matériaux');
-   ```
+4. **Create `clients` collection**
+   - Fields: name, phone, email, address, city, tax_id, client_type, created_at
 
-4. **Create `products` table**
-   ```sql
-   CREATE TABLE products (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     name TEXT NOT NULL,
-     category_id UUID REFERENCES categories(id),
-     wholesale_price DECIMAL NOT NULL,
-     retail_price DECIMAL NOT NULL,
-     quantity BIGINT DEFAULT 0,
-     unit TEXT DEFAULT 'pièce',
-     image_url TEXT,
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
+5. **Create `invoices` collection**
+   - Fields: invoice_number (unique), client_id, created_by, date, subtotal, discount, tax, total, status (draft/issued/paid), created_at
 
-   CREATE INDEX products_category_idx ON products(category_id);
-   ```
+6. **Create `invoice_items` subcollection** (under invoices)
+   - Fields: invoice_id, product_id, quantity, unit_price, line_total
 
-5. **Create `clients` table**
-   ```sql
-   CREATE TABLE clients (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     name TEXT NOT NULL,
-     phone TEXT,
-     email TEXT,
-     address TEXT,
-     city TEXT,
-     tax_id TEXT,
-     client_type TEXT DEFAULT 'individual', -- professional, individual
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
-   ```
-
-6. **Create `invoices` table**
-   ```sql
-   CREATE TABLE invoices (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     invoice_number TEXT UNIQUE NOT NULL,
-     client_id UUID REFERENCES clients(id),
-     created_by UUID REFERENCES auth.users,
-     date DATE NOT NULL,
-     subtotal DECIMAL NOT NULL,
-     discount DECIMAL DEFAULT 0,
-     tax DECIMAL DEFAULT 0,
-     total DECIMAL NOT NULL,
-     status TEXT DEFAULT 'draft', -- draft, issued, paid
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
-
-   CREATE INDEX invoices_client_idx ON invoices(client_id);
-   CREATE INDEX invoices_status_idx ON invoices(status);
-   ```
-
-7. **Create `invoice_items` table**
-   ```sql
-   CREATE TABLE invoice_items (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     invoice_id UUID REFERENCES invoices(id) ON DELETE CASCADE,
-     product_id UUID REFERENCES products(id),
-     quantity DECIMAL NOT NULL,
-     unit_price DECIMAL NOT NULL,
-     line_total DECIMAL NOT NULL
-   );
-
-   CREATE INDEX invoice_items_invoice_idx ON invoice_items(invoice_id);
-   ```
-
-8. **Create `settings` table**
-   ```sql
-   CREATE TABLE settings (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     shop_name TEXT DEFAULT 'Adetech Quincaillerie',
-     currency TEXT DEFAULT 'XOF',
-     currency_symbol TEXT DEFAULT 'FCFA',
-     phone TEXT,
-     email TEXT,
-     address TEXT,
-     tax_id TEXT,
-     logo_url TEXT,
-     default_language TEXT DEFAULT 'fr',
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
-   ```
+7. **Create `settings` collection**
+   - Document ID: 'company'
+   - Fields: shop_name, currency, currency_symbol, phone, email, address, tax_id, logo_url, default_language, created_at, updated_at
 
 #### Testing:
-- [ ] All tables created in Supabase
-- [ ] Categories pre-populated
-- [ ] Can query tables via Supabase console
-- [ ] Foreign keys working correctly
+- [ ] All collections created in Firebase Console
+- [ ] Can add documents via Firebase Console
+- [ ] Firestore security rules are set correctly
 
 ---
 
-### **STEP 0.8: Create Storage Buckets**
+### **STEP 0.8: Create Firebase Storage Buckets**
 
 #### Tasks:
-1. **Create `products` bucket**
-   - Public bucket for product images
-   - Allowed file types: jpg, png, webp
+1. **Create `products` storage path**
+   - Path: `gs://your-project.appspot.com/products/`
+   - For product images (jpg, png, webp)
 
-2. **Create `invoices` bucket**
-   - Private bucket for PDF files
+2. **Create `invoices` storage path**
+   - Path: `gs://your-project.appspot.com/invoices/`
+   - For PDF files (require authentication)
 
-3. **Create `logos` bucket**
-   - Public bucket for shop logo
+3. **Create `logos` storage path**
+   - Path: `gs://your-project.appspot.com/logos/`
+   - For shop logo (public access)
 
 #### Testing:
-- [ ] Can upload files to buckets
-- [ ] Public files are accessible via URL
-- [ ] Private files require authentication
+- [ ] Can upload files via Firebase Console
+- [ ] Storage security rules are properly configured
+- [ ] File access works as expected
 
 ---
 
@@ -394,7 +314,7 @@ This document provides detailed, actionable steps for building each phase of the
    │   ├── useClients.ts
    │   └── useInvoices.ts
    ├── services/
-   │   ├── supabase.ts
+   │   ├── firebase.ts
    │   ├── auth.ts
    │   ├── products.ts
    │   ├── clients.ts
@@ -470,39 +390,45 @@ This document provides detailed, actionable steps for building each phase of the
    export default App
    ```
 
-2. **Create Supabase client** `src/services/supabase.ts`
+2. **Create Firebase client** `src/services/firebase.ts`
    ```typescript
-   import { createClient } from '@supabase/supabase-js'
+   import { initializeApp } from 'firebase/app'
+   import { getAuth } from 'firebase/auth'
+   import { getFirestore } from 'firebase/firestore'
+   import { getStorage } from 'firebase/storage'
 
-   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+   const firebaseConfig = {
+     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+     appId: import.meta.env.VITE_FIREBASE_APP_ID,
+   }
 
-   export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+   const app = initializeApp(firebaseConfig)
+   export const auth = getAuth(app)
+   export const db = getFirestore(app)
+   export const storage = getStorage(app)
    ```
 
 3. **Create auth hook** `src/hooks/useAuth.ts`
    ```typescript
    import { useEffect, useState } from 'react'
-   import { supabase } from '../services/supabase'
-   import { Session } from '@supabase/supabase-js'
+   import { auth } from '../services/firebase'
+   import { User } from 'firebase/auth'
 
    export function useAuth() {
-     const [user, setUser] = useState<Session | null>(null)
+     const [user, setUser] = useState<User | null>(null)
      const [loading, setLoading] = useState(true)
 
      useEffect(() => {
-       supabase.auth.getSession().then(({ data: { session } }) => {
-         setUser(session)
+       const unsubscribe = auth.onAuthStateChanged((user) => {
+         setUser(user)
          setLoading(false)
        })
 
-       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-         (event, session) => {
-           setUser(session)
-         }
-       )
-
-       return () => subscription.unsubscribe()
+       return () => unsubscribe()
      }, [])
 
      return { user, loading }
@@ -563,7 +489,7 @@ This document provides detailed, actionable steps for building each phase of the
 #### Final Testing Checklist:
 - [ ] `npm run dev` starts without errors
 - [ ] No TypeScript compilation errors
-- [ ] Supabase connection established
+- [ ] Firebase connection established
 - [ ] Can perform a test auth operation
 - [ ] All UI libraries imported and working
 - [ ] i18n language toggle works
@@ -612,29 +538,51 @@ This document provides detailed, actionable steps for building each phase of the
    - Submit button
    - Confirmation message
 
-#### Implementation with Supabase:
+#### Implementation with Firebase:
 ```typescript
 // src/services/auth.ts
-import { supabase } from './supabase'
+import { auth } from './firebase'
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+} from 'firebase/auth'
 
 export async function login(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-  return { data, error }
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password)
+    return { data: result, error: null }
+  } catch (error) {
+    return { data: null, error }
+  }
 }
 
 export async function register(email: string, password: string) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  })
-  return { data, error }
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password)
+    return { data: result, error: null }
+  } catch (error) {
+    return { data: null, error }
+  }
 }
 
 export async function logout() {
-  return await supabase.auth.signOut()
+  try {
+    await signOut(auth)
+    return { error: null }
+  } catch (error) {
+    return { error }
+  }
+}
+
+export async function resetPassword(email: string) {
+  try {
+    await sendPasswordResetEmail(auth, email)
+    return { error: null }
+  } catch (error) {
+    return { error }
+  }
 }
 ```
 
@@ -837,25 +785,29 @@ export async function logout() {
 
 #### Implementation:
 ```typescript
-// Example stats query
+// Example stats query with Firestore
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore'
+import { db } from '../services/firebase'
+
 const getStats = async () => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
   // Today's sales
-  const { data: todaySales } = await supabase
-    .from('invoices')
-    .select('total')
-    .eq('status', 'paid')
-    .gte('date', todayDate)
+  const invoicesRef = collection(db, 'invoices')
+  const q = query(invoicesRef, where('status', '==', 'paid'), where('date', '>=', today))
+  const snapshot = await getDocs(q)
+  const todaySales = snapshot.docs.map(doc => doc.data().total).reduce((a, b) => a + b, 0)
 
-  // Total invoices
-  const { data: totalInvoices } = await supabase
-    .from('invoices')
-    .select('count', { count: 'exact' })
+  // Total invoices count
+  const allInvoices = await getDocs(invoicesRef)
+  const totalInvoices = allInvoices.size
 
-  // Low stock
-  const { data: lowStock } = await supabase
-    .from('products')
-    .select('count', { count: 'exact' })
-    .lt('quantity', 10)
+  // Low stock count
+  const productsRef = collection(db, 'products')
+  const lowStockQ = query(productsRef, where('quantity', '<', 10))
+  const lowStockSnapshot = await getDocs(lowStockQ)
+  const lowStock = lowStockSnapshot.size
 
   return { todaySales, totalInvoices, lowStock }
 }
@@ -1405,14 +1357,18 @@ export const clientSchema = z.object({
 
 2. **Auto-generate Invoice Number**
    ```typescript
-   const generateInvoiceNumber = async () => {
-     const { data: lastInvoice } = await supabase
-       .from('invoices')
-       .select('invoice_number')
-       .order('created_at', { ascending: false })
-       .limit(1)
+   import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
+   import { db } from '../services/firebase'
 
-     const lastNumber = parseInt(lastInvoice[0]?.invoice_number?.split('-')[2] || '0')
+   const generateInvoiceNumber = async () => {
+     const invoicesRef = collection(db, 'invoices')
+     const q = query(invoicesRef, orderBy('created_at', 'desc'), limit(1))
+     const snapshot = await getDocs(q)
+     
+     const lastNumber = snapshot.docs.length > 0 
+       ? parseInt(snapshot.docs[0].data().invoice_number.split('-')[2] || '0')
+       : 0
+     
      const newNumber = String(lastNumber + 1).padStart(3, '0')
      return `FACT-${new Date().getFullYear()}-${newNumber}`
    }
@@ -2889,8 +2845,12 @@ const Products = lazy(() => import('./pages/Products'))
 
 3. **Configure environment variables**
    - Add in Vercel dashboard:
-     - `VITE_SUPABASE_URL`
-     - `VITE_SUPABASE_ANON_KEY`
+     - `VITE_FIREBASE_API_KEY`
+     - `VITE_FIREBASE_AUTH_DOMAIN`
+     - `VITE_FIREBASE_PROJECT_ID`
+     - `VITE_FIREBASE_STORAGE_BUCKET`
+     - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+     - `VITE_FIREBASE_APP_ID`
 
 4. **Deploy**
    - Push to main branch triggers auto-deploy
@@ -2944,7 +2904,7 @@ vercel --prod
    - Troubleshooting guide
 
 4. **Backup & Recovery**
-   - Enable Supabase backups
+   - Enable Firebase automated backups
    - Test restore process
    - Document procedures
 
@@ -2981,7 +2941,7 @@ vercel --prod
 - [ ] PDF downloads correctly
 - [ ] Performance good
 - [ ] No console errors
-- [ ] No Supabase errors
+- [ ] No Firebase errors
 - [ ] Security validated
 - [ ] Deployed to Vercel
 - [ ] Custom domain (optional)
