@@ -59,7 +59,10 @@ export function TopProductsChart() {
       <div className="w-full h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="rgba(255,255,255,0.1)"
+            />
             <XAxis
               dataKey="name"
               stroke="rgba(255,255,255,0.3)"
@@ -77,11 +80,7 @@ export function TopProductsChart() {
                 color: "#fff",
               }}
             />
-            <Bar
-              dataKey="sales"
-              fill="#f97316"
-              radius={[8, 8, 0, 0]}
-            />
+            <Bar dataKey="sales" fill="#f97316" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

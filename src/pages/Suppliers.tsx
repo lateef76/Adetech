@@ -29,8 +29,13 @@ export function SuppliersPage() {
       >
         <DashboardHeader userName={user?.displayName || "User"} />
 
-        <motion.div variants={itemVariants} className="bg-slate-800 rounded-xl p-8 border border-white/10">
-          <h1 className="text-3xl font-bold text-white mb-4">Suppliers Management</h1>
+        <motion.div
+          variants={itemVariants}
+          className="bg-slate-800 rounded-xl p-8 border border-white/10"
+        >
+          <h1 className="text-3xl font-bold text-white mb-4">
+            Suppliers Management
+          </h1>
           <p className="text-gray-300">Suppliers page coming soon...</p>
         </motion.div>
       </motion.div>
