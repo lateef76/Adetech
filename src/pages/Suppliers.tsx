@@ -27,7 +27,7 @@ export function SuppliersPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader 
+        <DashboardHeader
           title="Suppliers"
           description="Manage your business suppliers and vendors"
           userName={user?.displayName || "User"}

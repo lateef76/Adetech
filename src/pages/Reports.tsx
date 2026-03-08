@@ -27,7 +27,7 @@ export function ReportsPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader 
+        <DashboardHeader
           title="Reports"
           description="Generate and analyze business reports"
           userName={user?.displayName || "User"}

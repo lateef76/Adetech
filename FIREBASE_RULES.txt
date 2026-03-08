@@ -1,4 +1,4 @@
-FIRESTORE SECURITY RULES - PRODUCTION READY
+FIRESTORE SECURITY RULES - UPDATED
 (Copy-paste this exactly into Firebase Console > Firestore > Rules)
 
 rules_version = '2';
@@ -14,21 +14,14 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // Check if user is admin
-    function isAdmin() {
-      return isAuthed() && 
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin");
-    }
-    
     // Check if user owns the resource
     function isOwner(userId) {
-      return request.auth.uid == userId;
+      return request.auth != null && request.auth.uid == userId;
     }
     
-    // Verify required fields exist
-    function hasRequiredFields(requiredFields) {
-      return resource == null || 
-        !resource.data.keys().hasAll(requiredFields);
+    // Check if user owns the document
+    function isDocOwner() {
+      return request.auth != null && request.auth.uid == resource.data.userId;
     }
     
     // ============================================
@@ -36,19 +29,17 @@ service cloud.firestore {
     // ============================================
     
     match /users/{userId} {
-      // Users can only read their own profile
+      // Users can read their own profile
       allow read: if isOwner(userId);
       
       // Users create their own profile on signup
-      allow create: if isOwner(userId) && 
-        request.resource.data.role in ["user", "admin"] &&
-        request.resource.data.role == "user"; // New users are always "user"
+      allow create: if isOwner(userId);
       
-      // Users update their own profile
-      allow update: if isOwner(userId) || isAdmin();
+      // Users update their own profile only
+      allow update: if isOwner(userId);
       
-      // Only admins can delete users
-      allow delete: if isAdmin();
+      // No deletes allowed by default
+      allow delete: if false;
     }
     
     // ============================================
@@ -56,20 +47,17 @@ service cloud.firestore {
     // ============================================
     
     match /clients/{clientId} {
-      // Owners and admins can read their clients
-      allow read: if isOwner(resource.data.userId) || isAdmin();
+      // Users can read their own clients
+      allow read: if isDocOwner();
       
-      // Create clients
-      allow create: if isAuthed() && 
-        isOwner(request.resource.data.userId) &&
-        request.resource.data.name is string &&
-        request.resource.data.client_type in ["professional", "individual"];
+      // Users can create clients
+      allow create: if isAuthed() && isOwner(request.resource.data.userId);
       
-      // Update clients
-      allow update: if isOwner(resource.data.userId) || isAdmin();
+      // Users can update their own clients
+      allow update: if isDocOwner();
       
-      // Delete clients
-      allow delete: if isOwner(resource.data.userId) || isAdmin();
+      // Users can delete their own clients
+      allow delete: if isDocOwner();
     }
     
     // ============================================
@@ -77,20 +65,17 @@ service cloud.firestore {
     // ============================================
     
     match /products/{productId} {
-      // Owners and admins can read products
-      allow read: if isOwner(resource.data.userId) || isAdmin();
+      // Users can read their own products
+      allow read: if isDocOwner();
       
-      // Create products
-      allow create: if isAuthed() && 
-        isOwner(request.resource.data.userId) &&
-        request.resource.data.name is string &&
-        request.resource.data.price >= 0;
+      // Users can create products
+      allow create: if isAuthed() && isOwner(request.resource.data.userId);
       
-      // Update products
-      allow update: if isOwner(resource.data.userId) || isAdmin();
+      // Users can update their own products
+      allow update: if isDocOwner();
       
-      // Delete products
-      allow delete: if isOwner(resource.data.userId) || isAdmin();
+      // Users can delete their own products
+      allow delete: if isDocOwner();
     }
     
     // ============================================
@@ -98,30 +83,43 @@ service cloud.firestore {
     // ============================================
     
     match /receipts/{receiptId} {
-      // Owners and admins can read receipts
-      allow read: if isOwner(resource.data.userId) || isAdmin();
+      // Users can read their own receipts
+      allow read: if isDocOwner();
       
-      // Create receipts
-      allow create: if isAuthed() && 
-        isOwner(request.resource.data.userId) &&
-        request.resource.data.receiptNumber is string &&
-        request.resource.data.status in ["draft", "sent", "paid"];
+      // Users can create receipts
+      allow create: if isAuthed() && isOwner(request.resource.data.userId);
       
-      // Update receipts
-      allow update: if isOwner(resource.data.userId) || isAdmin();
+      // Users can update their own receipts
+      allow update: if isDocOwner();
       
-      // Delete receipts (only drafts)
-      allow delete: if (isOwner(resource.data.userId) || isAdmin()) && 
-        resource.data.status == "draft";
+      // Users can delete their own receipts
+      allow delete: if isDocOwner();
     }
     
     // Legacy invoices support (mapped to receipts)
     match /invoices/{invoiceId} {
-      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow read: if isDocOwner();
       allow create: if isAuthed() && isOwner(request.resource.data.userId);
-      allow update: if isOwner(resource.data.userId) || isAdmin();
-      allow delete: if (isOwner(resource.data.userId) || isAdmin()) && 
-        resource.data.status == "draft";
+      allow update: if isDocOwner();
+      allow delete: if isDocOwner();
+    }
+    
+    // ============================================
+    // COMPANY SETTINGS COLLECTION
+    // ============================================
+    
+    match /company_settings/{settingsId} {
+      // Users can read their own settings
+      allow read: if isDocOwner();
+      
+      // Users can create their own settings
+      allow create: if isAuthed() && isOwner(request.resource.data.userId);
+      
+      // Users can update their own settings
+      allow update: if isDocOwner();
+      
+      // Users can delete their own settings
+      allow delete: if isDocOwner();
     }
     
     // ============================================
@@ -129,9 +127,11 @@ service cloud.firestore {
     // ============================================
     
     match /categories/{categoryId} {
-      // Admins manage categories
-      allow read: if isAuthed(); // Everyone can read
-      allow create, update, delete: if isAdmin();
+      // Everyone can read categories
+      allow read: if isAuthed();
+      
+      // Only deny writes for now (add admin role later if needed)
+      allow write: if false;
     }
     
     // ============================================
@@ -139,14 +139,21 @@ service cloud.firestore {
     // ============================================
     
     match /suppliers/{supplierId} {
-      allow read: if isOwner(resource.data.userId) || isAdmin();
+      // Users can read their own suppliers
+      allow read: if isDocOwner();
+      
+      // Users can create suppliers
       allow create: if isAuthed() && isOwner(request.resource.data.userId);
-      allow update: if isOwner(resource.data.userId) || isAdmin();
-      allow delete: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Users can update their own suppliers
+      allow update: if isDocOwner();
+      
+      // Users can delete their own suppliers
+      allow delete: if isDocOwner();
     }
     
     // ============================================
-    // CATCH-ALL DENY
+    // CATCH-ALL DENY (EVERYTHING ELSE BLOCKED)
     // ============================================
     
     match /{document=**} {
@@ -154,3 +161,27 @@ service cloud.firestore {
     }
   }
 }
+
+// ============================================
+// REQUIRED COMPOSITE INDEXES
+// ============================================
+// Create these in Firebase Console > Firestore > Indexes > Composite Indexes
+//
+// Index 1: receipts collection
+// - Collection: receipts
+// - Fields: userId (Ascending), issueDate (Descending)
+// - Status: Auto-created when first compound query is made
+//
+// Index 2: receipts collection (optional - for client receipts)
+// - Collection: receipts  
+// - Fields: userId (Ascending), clientId (Ascending), issueDate (Descending)
+// - Status: Create manually if needed
+//
+// If you see "The query requires an index" error:
+// 1. Click the link in the error message (Firebase Console will open)
+// 2. Click "Create Index"
+// 3. Wait 2-5 minutes for index to be created
+//
+// Alternatively, create them manually:
+// Firebase Console > Firestore > Indexes > Create new index
+// ============================================

@@ -212,7 +212,7 @@ export function Sidebar() {
               >
                 {/* Glow effect */}
                 <div className="absolute inset-0 bg-linear-to-br from-orange-500 to-orange-600 rounded-lg blur-lg opacity-50" />
-                
+
                 {/* Logo container */}
                 <div className="relative w-12 h-12 bg-linear-to-br from-orange-500/10 to-orange-600/10 rounded-lg border border-orange-500/30 flex items-center justify-center backdrop-blur-sm">
                   {/* Stylized A letter */}
@@ -267,10 +267,7 @@ export function Sidebar() {
               className="w-full flex flex-col items-center gap-3 relative z-10"
             >
               {/* Collapsed Logo */}
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="relative"
-              >
+              <motion.div whileHover={{ scale: 1.05 }} className="relative">
                 <div className="absolute inset-0 bg-linear-to-br from-orange-500 to-orange-600 rounded-lg blur-lg opacity-50" />
                 <div className="relative w-10 h-10 bg-linear-to-br from-orange-500/10 to-orange-600/10 rounded-lg border border-orange-500/30 flex items-center justify-center backdrop-blur-sm">
                   <svg
@@ -445,9 +442,7 @@ export function Sidebar() {
             transition={{ delay: 0.4 }}
           >
             <div className="flex items-center gap-3">
-              <motion.div 
-                className="relative"
-              >
+              <motion.div className="relative">
                 <div className="w-10 h-10 rounded-full bg-linear-to-r from-orange-500 to-orange-600 flex items-center justify-center text-white font-bold shadow-lg shadow-orange-500/30">
                   {user.displayName
                     ? user.displayName

@@ -7,6 +7,8 @@ import { DashboardPage } from "@/pages/Dashboard";
 import { InventoryPage } from "@/pages/Inventory";
 import { SalesPage } from "@/pages/Sales";
 import { ReceiptsPage } from "@/pages/Receipts";
+import { NewReceiptPage } from "@/pages/NewReceipt";
+import { ReceiptDetailsPage } from "@/pages/ReceiptDetails";
 import { ClientsPage } from "@/pages/Clients";
 import { SuppliersPage } from "@/pages/Suppliers";
 import { ProductsPage } from "@/pages/Products";
@@ -60,6 +62,22 @@ export default function App() {
           element={
             <ProtectedRoute>
               <ReceiptsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/receipts/new"
+          element={
+            <ProtectedRoute>
+              <NewReceiptPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/receipts/:id"
+          element={
+            <ProtectedRoute>
+              <ReceiptDetailsPage />
             </ProtectedRoute>
           }
         />

@@ -27,7 +27,7 @@ export function ProfilePage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader 
+        <DashboardHeader
           title="Profile"
           description="Manage your profile and personal information"
           userName={user?.displayName || "User"}

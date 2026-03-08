@@ -128,7 +128,7 @@ export function ProductsPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader 
+        <DashboardHeader
           title="Products"
           description="Manage your product inventory and categories"
           userName={user?.displayName || "User"}

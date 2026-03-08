@@ -142,6 +142,7 @@ export function DashboardPage() {
           title="Dashboard"
           description="Welcome back to your business dashboard"
           userName={user?.displayName || user?.email || "User"}
+          showWelcome={true}
         />
 
         {/* Stats Grid */}

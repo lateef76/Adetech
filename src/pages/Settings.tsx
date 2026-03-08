@@ -1,10 +1,13 @@
 import { MainLayout } from "@/layouts/MainLayout";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { useAuth } from "@/hooks/useAuth";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
+import { CompanySettingsForm } from "@/components/settings/CompanySettingsForm";
 import { motion } from "framer-motion";
 
 export function SettingsPage() {
   const { user } = useAuth();
+  const { settings, loading, saveSettings } = useCompanySettings();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -27,18 +30,18 @@ export function SettingsPage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader 
+        <DashboardHeader
           title="Settings"
-          description="Configure your application settings"
+          description="Configure your application and company settings"
           userName={user?.displayName || "User"}
         />
 
-        <motion.div
-          variants={itemVariants}
-          className="bg-slate-800 rounded-xl p-8 border border-white/10"
-        >
-          <h1 className="text-3xl font-bold text-white mb-4">Settings</h1>
-          <p className="text-gray-300">Settings page coming soon...</p>
+        <motion.div variants={itemVariants}>
+          <CompanySettingsForm
+            initialSettings={settings || undefined}
+            onSubmit={saveSettings}
+            isLoading={loading}
+          />
         </motion.div>
       </motion.div>
     </MainLayout>

@@ -27,7 +27,7 @@ export function RevenuePage() {
         initial="hidden"
         animate="visible"
       >
-        <DashboardHeader 
+        <DashboardHeader
           title="Revenue"
           description="Monitor your revenue and earnings"
           userName={user?.displayName || "User"}
